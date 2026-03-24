@@ -1,0 +1,81 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+/* ── CSS Variables ── */
+:root {
+  --primary:      #213D57;
+  --primary-md:   #334C64;
+  --primary-lt:   #475F76;
+  --border:       #C6D1D8;
+  --border-lt:    #dde5ea;
+  --white:        #FFFFFF;
+  --bg:           #F4F7F9;
+  --bg-card:      #FFFFFF;
+  --text-dark:    #213D57;
+  --text-mid:     #334C64;
+  --text-muted:   #475F76;
+  --text-faint:   #7a92a3;
+  --shadow-sm:    0 1px 4px rgba(33,61,87,.08);
+  --shadow-md:    0 4px 16px rgba(33,61,87,.12);
+  --shadow-lg:    0 8px 32px rgba(33,61,87,.16);
+  --radius-sm:    6px;
+  --radius:       10px;
+  --radius-lg:    14px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0; padding: 0;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text-dark);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary-lt); }
+
+::selection { background: rgba(33,61,87,.18); color: var(--primary); }
+
+a { color: inherit; }
+button { font-family: inherit; }
+input, select, textarea { font-family: inherit; }
+
+/* ── Status badges ── */
+.badge-status {
+  display: inline-block; padding: 3px 11px;
+  border-radius: 99px; font-size: 11px; font-weight: 600;
+}
+.status-new          { background: #dbeafe; color: #1e40af; }
+.status-in-progress  { background: #e0e7ff; color: #3730a3; }
+.status-resolved     { background: #d1fae5; color: #065f46; }
+.status-closed       { background: #f1f5f9; color: #475569; }
+.status-on-hold      { background: #fff7ed; color: #9a3412; }
+
+.badge-priority {
+  display: inline-block; padding: 3px 11px;
+  border-radius: 99px; font-size: 11px; font-weight: 600; color: #fff;
+}
+
+/* ── Loading ring ── */
+.loading-ring {
+  width: 40px; height: 40px; border-radius: 50%;
+  border: 3px solid var(--border);
+  border-top-color: var(--primary);
+  animation: spin .8s linear infinite;
+}
+.loading-state {
+  display: flex; justify-content: center; align-items: center; padding: 80px 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Shared card ── */
+.card {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}

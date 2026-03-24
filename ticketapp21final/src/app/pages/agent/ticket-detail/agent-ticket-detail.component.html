@@ -1,0 +1,170 @@
+<app-navbar />
+<div class="page">
+  @if (ticket()) {
+    <a routerLink="/agent/tickets" class="back"><i class="bi bi-arrow-left"></i> Back to Tickets</a>
+
+    <div class="dhdr">
+      <div class="dhdr-top">
+        <span class="tid">#{{ ticket()!.id }}</span>
+        <span class="badge-status status-{{ ticket()!.statusName | lowercase | replace:' ':'-' }}">{{ ticket()!.statusName }}</span>
+        <span class="badge-priority" [style.background]="prioBg(ticket()!.priorityName)">{{ ticket()!.priorityName }}</span>
+        @if (ticket()!.dueAt && isOverdue(ticket()!.dueAt!)) {
+          <span class="ov-badge"><i class="bi bi-alarm"></i> Overdue</span>
+        }
+      </div>
+      <h1 class="dtitle">{{ ticket()!.title }}</h1>
+    </div>
+
+    <div class="dgrid">
+      <!-- Main column -->
+      <div class="mcol">
+
+        <!-- Description -->
+        <div class="card">
+          <div class="ch"><h3><i class="bi bi-file-text"></i> Description</h3></div>
+          <div class="cb"><p class="desc">{{ ticket()!.description || 'No description provided.' }}</p></div>
+        </div>
+
+        <!-- Update Status -->
+        <div class="card">
+          <div class="ch"><h3><i class="bi bi-arrow-clockwise"></i> Update Status</h3></div>
+          <div class="cb">
+            <div class="irow">
+              <select [(ngModel)]="newStatusId" class="fsel">
+                <option [ngValue]="0">Select new status…</option>
+                @for (s of statuses(); track s.id) { <option [ngValue]="s.id">{{ s.name }}</option> }
+              </select>
+              <input type="text" [(ngModel)]="statusNote" placeholder="Optional note…" class="finp" />
+              <button class="btn-pri" (click)="updateStatus()" [disabled]="!newStatusId">
+                <i class="bi bi-check-circle"></i> Update
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Comments -->
+        <div class="card">
+          <div class="ch"><h3><i class="bi bi-chat-dots"></i> Comments ({{ comments().length }})</h3></div>
+          <div class="cb">
+            <div class="cform">
+              <textarea [(ngModel)]="newComment" rows="3" placeholder="Write a comment…" class="cta"></textarea>
+              <div class="cfooter">
+                <label class="chk">
+                  <input type="checkbox" [(ngModel)]="isInternal" />
+                  <span>Internal note</span>
+                </label>
+                <button class="btn-pri" (click)="addComment()" [disabled]="!newComment.trim()">
+                  <i class="bi bi-send"></i> Post
+                </button>
+              </div>
+            </div>
+            <div class="clist">
+              @for (c of comments(); track c.id) {
+                <div class="ci" [class.int]="c.isInternal">
+                  <div class="cav">{{ c.postedByName[0] }}</div>
+                  <div class="cbody">
+                    <div class="cmeta">
+                      <span class="cname">{{ c.postedByName }}</span>
+                      @if (c.isInternal) { <span class="itag">Internal</span> }
+                      <span class="ctime">{{ c.createdAt | date:'MMM d, h:mm a' }}</span>
+                    </div>
+                    <p class="ctext">{{ c.body }}</p>
+                  </div>
+                </div>
+              } @empty { <p class="empty-msg">No comments yet.</p> }
+            </div>
+          </div>
+        </div>
+
+        <!-- Attachments -->
+        <div class="card">
+          <div class="ch"><h3><i class="bi bi-paperclip"></i> Attachments ({{ attachments().length }})</h3></div>
+          <div class="cb">
+            <label class="upload-zone">
+              <i class="bi bi-cloud-upload-fill"></i>
+              <span>Click to upload a file</span>
+              <input type="file" class="file-inp" (change)="onFile($event)" />
+            </label>
+            <div class="attach-list">
+              @for (a of attachments(); track a.id) {
+                <div class="arow">
+                  <i class="bi bi-file-earmark aico"></i>
+                  <div class="ainfo">
+                    <span class="aname">{{ a.fileName }}</span>
+                    <span class="ameta">{{ fmtSize(a.fileSizeBytes) }} · {{ a.uploadedAt | date:'MMM d, y' }}</span>
+                  </div>
+                  <button class="dl-btn" (click)="download(a)" title="Download">
+                    <i class="bi bi-download"></i>
+                  </button>
+                  <button class="del-btn" (click)="deleteAttachment(a)"
+                    [disabled]="deletingAttachId() === a.id" title="Delete">
+                    @if (deletingAttachId() === a.id) { <span class="spin-sm"></span> }
+                    @else { <i class="bi bi-trash"></i> }
+                  </button>
+                </div>
+              } @empty { <p class="empty-msg">No attachments.</p> }
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Sidebar -->
+      <div class="scol">
+        <div class="card">
+          <div class="ch"><h3>Ticket Details</h3></div>
+          <div class="cb">
+            <dl class="ddl">
+              <dt>Status</dt>
+              <dd><span class="badge-status status-{{ ticket()!.statusName | lowercase | replace:' ':'-' }}">{{ ticket()!.statusName }}</span></dd>
+              <dt>Priority</dt>
+              <dd><span class="badge-priority" [style.background]="prioBg(ticket()!.priorityName)">{{ ticket()!.priorityName }}</span></dd>
+              <dt>Department</dt>  <dd>{{ ticket()!.departmentName ?? '—' }}</dd>
+              <dt>Category</dt>    <dd>{{ ticket()!.categoryName ?? '—' }}</dd>
+              <dt>Created By</dt>  <dd>{{ ticket()!.createdByUserName }}</dd>
+              <dt>Assignee</dt>
+              <dd>
+                @if (ticket()!.currentAssigneeUserName) {
+                  <i class="bi bi-person-check-fill" style="color:#16a34a"></i>
+                  {{ ticket()!.currentAssigneeUserName }}
+                } @else { Unassigned }
+              </dd>
+              <dt>Created</dt>    <dd>{{ ticket()!.createdAt | date:'MMM d, y' }}</dd>
+              <dt>Updated</dt>    <dd>{{ ticket()!.updatedAt ? (ticket()!.updatedAt | date:'MMM d, y') : '—' }}</dd>
+              <dt>Due Date</dt>
+              <dd [class.ov]="ticket()!.dueAt && isOverdue(ticket()!.dueAt!)">
+                {{ ticket()!.dueAt ? (ticket()!.dueAt | date:'MMM d, y') : '—' }}
+              </dd>
+            </dl>
+          </div>
+        </div>
+
+        <!-- Status History -->
+        <div class="card">
+          <div class="ch"><h3><i class="bi bi-clock-history"></i> Status History</h3></div>
+          <div class="cb">
+            <div class="hlist">
+              @for (h of history(); track h.id) {
+                <div class="hi">
+                  <i class="bi bi-arrow-right-circle hic"></i>
+                  <div class="hcnt">
+                    <div class="hchg">
+                      <span>{{ h.oldStatusName ?? 'New' }}</span>
+                      <i class="bi bi-arrow-right" style="font-size:10px;color:var(--text-faint)"></i>
+                      <span class="hnew">{{ h.newStatusName }}</span>
+                    </div>
+                    <span class="hmeta">{{ h.changedByUserName }} · {{ h.changedAt | date:'MMM d, y' }}</span>
+                    @if (h.note) { <span class="hnote">{{ h.note }}</span> }
+                  </div>
+                </div>
+              } @empty { <p class="empty-msg">No history yet.</p> }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  } @else {
+    <div class="loading-state"><div class="loading-ring"></div></div>
+  }
+</div>

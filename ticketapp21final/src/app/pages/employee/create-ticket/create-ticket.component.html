@@ -1,0 +1,112 @@
+<app-navbar />
+<div class="page">
+  <div class="page-header">
+    <a routerLink="/employee/dashboard" class="back"><i class="bi bi-arrow-left"></i> Back</a>
+    <h1 class="pt">Submit a Ticket</h1>
+    <p class="ps">Describe your issue and we'll route it to the right team</p>
+  </div>
+
+  <div class="form-card">
+    <form (ngSubmit)="onSubmit()" #f="ngForm" novalidate>
+
+      <!-- Section 1: Basic Info -->
+      <div class="fsec">
+        <div class="sec-label"><span class="sec-num">01</span><span>Basic Information</span></div>
+        <div class="fg">
+          <label>Title <span class="req">*</span></label>
+          <input type="text" name="title" [(ngModel)]="form.title" required maxlength="200"
+            placeholder="Brief description of the issue" class="fc" />
+          <span class="char-hint">{{ titleLen }}/200</span>
+        </div>
+        <div class="fg" style="margin-top:18px">
+          <label>Description</label>
+          <textarea name="description" [(ngModel)]="form.description" rows="5"
+            placeholder="Detailed description — steps to reproduce, expected vs actual behaviour…"
+            class="fc fc-ta"></textarea>
+        </div>
+      </div>
+
+      <!-- Section 2: Classification -->
+      <div class="fsec">
+        <div class="sec-label"><span class="sec-num">02</span><span>Classification</span></div>
+        <div class="row3">
+          <div class="fg">
+            <label>Department</label>
+            <select name="departmentId" [(ngModel)]="form.departmentId" class="fc fsel">
+              <option [ngValue]="undefined">Select department</option>
+              @for (d of depts(); track d.id) { <option [ngValue]="d.id">{{ d.name }}</option> }
+            </select>
+          </div>
+          <div class="fg">
+            <label>Category</label>
+            <select name="categoryId" [(ngModel)]="form.categoryId" class="fc fsel">
+              <option [ngValue]="undefined">Select category</option>
+              @for (c of cats(); track c.id) { <option [ngValue]="c.id">{{ c.name }}</option> }
+            </select>
+          </div>
+          <div class="fg">
+            <label>Priority <span class="req">*</span></label>
+            <select name="priorityId" [(ngModel)]="form.priorityId" required class="fc fsel">
+              <option [ngValue]="0">Select priority</option>
+              @for (p of prios(); track p.id) { <option [ngValue]="p.id">{{ p.name }}</option> }
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 3: Due Date -->
+      <div class="fsec">
+        <div class="sec-label"><span class="sec-num">03</span><span>Timeline (optional)</span></div>
+        <div class="fg due-fg">
+          <label>Due Date</label>
+          <input type="datetime-local" name="dueAt" [(ngModel)]="form.dueAt" class="fc" />
+        </div>
+      </div>
+
+      <!-- Section 4: Attachments -->
+      <div class="fsec">
+        <div class="sec-label"><span class="sec-num">04</span><span>Attachments (optional)</span></div>
+
+        <label class="upload-zone">
+          <i class="bi bi-cloud-upload-fill"></i>
+          <span class="uz-title">Click to add files</span>
+          <span class="uz-sub">Any file type • Multiple files allowed</span>
+          <input type="file" class="file-inp" multiple (change)="onFileSelect($event)" />
+        </label>
+
+        @if (selectedFiles().length > 0) {
+          <div class="file-list">
+            <div class="file-list-header">
+              <span>{{ selectedFiles().length }} file(s) selected — {{ totalSize }}</span>
+            </div>
+            @for (file of selectedFiles(); track file.name; let i = $index) {
+              <div class="file-item">
+                <i class="bi bi-file-earmark file-ico"></i>
+                <span class="file-name">{{ file.name }}</span>
+                <span class="file-size">{{ fmtSize(file.size) }}</span>
+                <button type="button" class="file-remove" (click)="removeFile(i)" title="Remove">
+                  <i class="bi bi-x"></i>
+                </button>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Footer -->
+      <div class="form-footer">
+        <a routerLink="/employee/dashboard" class="btn-cancel">Cancel</a>
+        <button type="submit" class="btn-submit" [disabled]="loading() || !f.valid || !form.priorityId">
+          @if (uploadingFiles()) {
+            <span class="spin"></span> Uploading files…
+          } @else if (loading()) {
+            <span class="spin"></span> Submitting…
+          } @else {
+            <i class="bi bi-send-fill"></i>
+            Submit Ticket @if (selectedFiles().length > 0) { ({{ selectedFiles().length }} file{{ selectedFiles().length > 1 ? 's' : '' }}) }
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,68 @@
+<nav class="navbar">
+  <div class="navbar-brand"><i class="bi bi-ticket-perforated-fill"></i><span>TicketDesk</span></div>
+
+  @if (auth.isAdmin()) {
+    <div class="navbar-links">
+      <a routerLink="/admin/dashboard"  routerLinkActive="active"><i class="bi bi-speedometer2"></i> Dashboard</a>
+      <a routerLink="/admin/tickets"    routerLinkActive="active"><i class="bi bi-ticket-detailed"></i> All Tickets</a>
+      <a routerLink="/admin/users"      routerLinkActive="active"><i class="bi bi-people"></i> Users</a>
+    </div>
+  }
+  @if (auth.isAgent()) {
+    <div class="navbar-links">
+      <a routerLink="/agent/dashboard" routerLinkActive="active"><i class="bi bi-speedometer2"></i> Dashboard</a>
+      <a routerLink="/agent/tickets"   routerLinkActive="active"><i class="bi bi-ticket-detailed"></i> My Tickets</a>
+    </div>
+  }
+  @if (auth.isEmployee()) {
+    <div class="navbar-links">
+      <a routerLink="/employee/dashboard"     routerLinkActive="active"><i class="bi bi-house"></i> Home</a>
+      <a routerLink="/employee/create-ticket" routerLinkActive="active"><i class="bi bi-plus-circle"></i> New Ticket</a>
+      <a routerLink="/employee/my-tickets"    routerLinkActive="active"><i class="bi bi-list-ul"></i> My Tickets</a>
+    </div>
+  }
+
+  <!-- Profile hover dropdown -->
+  <div class="profile-wrap">
+    <a routerLink="/profile" class="profile-trigger" title="My Profile">
+      <div class="user-avatar">{{ initials() }}</div>
+      <div class="user-meta-inline">
+        <span class="user-name-inline">{{ auth.currentUser()?.displayName }}</span>
+        <span class="role-pill role-{{ auth.role()?.toLowerCase() }}">{{ auth.role() }}</span>
+      </div>
+      <i class="bi bi-chevron-down chev-icon"></i>
+    </a>
+
+    <div class="hover-dropdown">
+      <div class="hd-header">
+        <div class="hd-avatar">{{ initials() }}</div>
+        <div class="hd-info">
+          <span class="hd-name">{{ auth.currentUser()?.displayName }}</span>
+          <span class="hd-un">&#64;{{ auth.currentUser()?.userName }}</span>
+        </div>
+      </div>
+      <div class="hd-sep"></div>
+      <div class="hd-rows">
+        <div class="hd-row">
+          <i class="bi bi-shield-check"></i>
+          <span>Role</span>
+          <span class="hd-val role-pill role-{{ auth.role()?.toLowerCase() }}">{{ auth.role() }}</span>
+        </div>
+        <div class="hd-row">
+          <i class="bi bi-circle-fill dot-green"></i>
+          <span>Status</span>
+          <span class="hd-val green-txt">Active</span>
+        </div>
+      </div>
+      <div class="hd-sep"></div>
+      <div class="hd-actions">
+        <a routerLink="/profile" class="hd-action">
+          <i class="bi bi-person-circle"></i> View Profile
+        </a>
+        <button class="hd-action hd-signout" (click)="auth.logout()">
+          <i class="bi bi-box-arrow-right"></i> Sign Out
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>

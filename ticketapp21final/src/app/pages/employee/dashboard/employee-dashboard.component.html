@@ -1,0 +1,43 @@
+<app-navbar />
+<div class="page">
+
+  <!-- Welcome banner -->
+  <div class="banner">
+    <div class="banner-content">
+      <h1 class="greeting">Hello, {{ auth.currentUser()?.displayName }} </h1>
+      <p class="sub">How can we help you today?</p>
+    </div>
+    <a routerLink="/employee/create-ticket" class="btn-create">
+      <i class="bi bi-plus-circle-fill"></i> Submit New Ticket
+    </a>
+  </div>
+
+  <!-- Stats -->
+  @if (summary()) {
+    <div class="stats-row">
+      <div class="sp"><span class="sv">{{ summary()!.total }}</span><span class="sl">My Tickets</span></div>
+      <div class="sp sp-blue"><span class="sv">{{ summary()!.open }}</span><span class="sl">Open</span></div>
+      <div class="sp sp-indigo"><span class="sv">{{ summary()!.inProgress }}</span><span class="sl">In Progress</span></div>
+      <div class="sp sp-green"><span class="sv">{{ summary()!.resolved }}</span><span class="sl">Resolved</span></div>
+      @if (summary()!.overdue > 0) {
+        <div class="sp sp-red"><span class="sv">{{ summary()!.overdue }}</span><span class="sl">Overdue</span></div>
+      }
+    </div>
+  }
+
+  <!-- Action cards -->
+  <h2 class="section-title">What would you like to do?</h2>
+  <div class="card-grid">
+    <a routerLink="/employee/create-ticket" class="ac ac-primary">
+      <div class="ac-icon"><i class="bi bi-plus-square-fill"></i></div>
+      <div class="ac-text"><h3>Submit a Ticket</h3><p>Report an issue or request support</p></div>
+      <i class="bi bi-arrow-right ac-arr"></i>
+    </a>
+    <a routerLink="/employee/my-tickets" class="ac">
+      <div class="ac-icon"><i class="bi bi-list-check"></i></div>
+      <div class="ac-text"><h3>My Tickets</h3><p>Track the status of your requests</p></div>
+      <i class="bi bi-arrow-right ac-arr"></i>
+    </a>
+  </div>
+
+</div>

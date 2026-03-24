@@ -1,0 +1,36 @@
+<app-navbar />
+<div class="page">
+  <div class="ph">
+    <div><h1 class="pt">Admin Dashboard</h1><p class="ps">System-wide ticket overview</p></div>
+    <a routerLink="/admin/tickets" class="btn-sec"><i class="bi bi-ticket-detailed"></i> View All Tickets</a>
+  </div>
+  @if (summary()) {
+    <div class="stats-grid">
+      <div class="sc sc-indigo"><div class="si"><i class="bi bi-ticket-perforated"></i></div><div class="sb"><span class="sv">{{ summary()!.total }}</span><span class="sl">Total</span></div></div>
+      <div class="sc sc-blue"><div class="si"><i class="bi bi-circle"></i></div><div class="sb"><span class="sv">{{ summary()!.open }}</span><span class="sl">Open</span></div></div>
+      <div class="sc sc-purple"><div class="si"><i class="bi bi-arrow-clockwise"></i></div><div class="sb"><span class="sv">{{ summary()!.inProgress }}</span><span class="sl">In Progress</span></div></div>
+      <div class="sc sc-green"><div class="si"><i class="bi bi-check-circle"></i></div><div class="sb"><span class="sv">{{ summary()!.resolved }}</span><span class="sl">Resolved</span></div></div>
+      <div class="sc sc-gray"><div class="si"><i class="bi bi-x-circle"></i></div><div class="sb"><span class="sv">{{ summary()!.closed }}</span><span class="sl">Closed</span></div></div>
+      <div class="sc sc-red"><div class="si"><i class="bi bi-exclamation-triangle"></i></div><div class="sb"><span class="sv">{{ summary()!.overdue }}</span><span class="sl">Overdue</span></div></div>
+    </div>
+    <div class="row2">
+      <div class="card">
+        <div class="ch"><h3>Priority Breakdown</h3></div>
+        <div class="cb">
+          <div class="pbars">
+            <div class="prow"><span class="pl"><span class="dot dot-h"></span>High</span><div class="bt"><div class="bf bh" [style.width.%]="pct(summary()!.highPriority,summary()!.total)"></div></div><span class="pc">{{ summary()!.highPriority }}</span></div>
+            <div class="prow"><span class="pl"><span class="dot dot-m"></span>Medium</span><div class="bt"><div class="bf bm" [style.width.%]="pct(summary()!.mediumPriority,summary()!.total)"></div></div><span class="pc">{{ summary()!.mediumPriority }}</span></div>
+            <div class="prow"><span class="pl"><span class="dot dot-l"></span>Low</span><div class="bt"><div class="bf bl" [style.width.%]="pct(summary()!.lowPriority,summary()!.total)"></div></div><span class="pc">{{ summary()!.lowPriority }}</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="ch"><h3>Quick Actions</h3></div>
+        <div class="cb">
+          <a routerLink="/admin/tickets"    class="qa"><i class="bi bi-ticket-detailed"></i><div><strong>All Tickets</strong><span>View and manage tickets</span></div><i class="bi bi-chevron-right qa-arr"></i></a>
+          <a routerLink="/admin/users"      class="qa"><i class="bi bi-people"></i><div><strong>Agents</strong><span>View agent workload</span></div><i class="bi bi-chevron-right qa-arr"></i></a>
+        </div>
+      </div>
+    </div>
+  } @else { <div class="loading-state"><div class="loading-ring"></div></div> }
+</div>

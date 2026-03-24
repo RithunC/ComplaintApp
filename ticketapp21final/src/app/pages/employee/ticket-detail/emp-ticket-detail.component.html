@@ -1,0 +1,176 @@
+<app-navbar />
+<div class="page">
+  @if (ticket()) {
+    <a routerLink="/employee/my-tickets" class="back"><i class="bi bi-arrow-left"></i> My Tickets</a>
+
+    <div class="hero">
+      <div class="hero-top">
+        <span class="tid">#{{ ticket()!.id }}</span>
+        <span class="badge-status status-{{ ticket()!.statusName | lowercase | replace:' ':'-' }}">{{ ticket()!.statusName }}</span>
+        <span class="badge-priority" [style.background]="prioBg(ticket()!.priorityName)">{{ ticket()!.priorityName }}</span>
+        @if (ticket()!.dueAt && isOverdue(ticket()!.dueAt!)) {
+          <span class="ov-badge"><i class="bi bi-alarm"></i> Overdue</span>
+        }
+      </div>
+      <h1 class="hero-title">{{ ticket()!.title }}</h1>
+    </div>
+
+    <div class="dgrid">
+      <!-- ── Main column ── -->
+      <div class="mcol">
+
+        <!-- Description -->
+        <div class="card">
+          <div class="ch"><h3><i class="bi bi-file-text"></i> Description</h3></div>
+          <div class="cb"><p class="desc">{{ ticket()!.description || 'No description provided.' }}</p></div>
+        </div>
+
+        <!-- Comments -->
+        <div class="card">
+          <div class="ch"><h3><i class="bi bi-chat-dots"></i> Comments ({{ comments().length }})</h3></div>
+          <div class="cb">
+            @if (isClosed) {
+              <div class="closed-notice">
+                <i class="bi bi-lock-fill"></i>
+                <span>Ticket is closed — comments are disabled.</span>
+              </div>
+            } @else {
+              <div class="cform">
+                <textarea [(ngModel)]="newComment" rows="3"
+                  placeholder="Add a comment…" class="cta"></textarea>
+                <div class="cfooter">
+                  <button class="btn-post" (click)="addComment()" [disabled]="!newComment.trim()">
+                    <i class="bi bi-send-fill"></i> Post Comment
+                  </button>
+                </div>
+              </div>
+            }
+            <div class="clist">
+              @for (c of comments(); track c.id) {
+                <div class="ci">
+                  <div class="cav">{{ c.postedByName[0] }}</div>
+                  <div class="cbody">
+                    <div class="cmeta">
+                      <span class="cname">{{ c.postedByName }}</span>
+                      <span class="ctime">{{ c.createdAt | date:'MMM d, y h:mm a' }}</span>
+                    </div>
+                    <p class="ctext">{{ c.body }}</p>
+                  </div>
+                </div>
+              } @empty {
+                <p class="empty-msg">No comments yet. Be the first!</p>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Attachments -->
+        <div class="card">
+          <div class="ch"><h3><i class="bi bi-paperclip"></i> Attachments ({{ attachments().length }})</h3></div>
+          <div class="cb">
+            @if (!isClosed) {
+              <label class="upload-zone">
+                <i class="bi bi-cloud-upload"></i>
+                <span>Click to upload a file</span>
+                <input type="file" class="file-inp" (change)="onFile($event)" />
+              </label>
+            }
+            <div class="attach-list">
+              @for (a of attachments(); track a.id) {
+                <div class="arow">
+                  <i class="bi bi-file-earmark aico"></i>
+                  <div class="ainfo">
+                    <span class="aname">{{ a.fileName }}</span>
+                    <span class="ameta">{{ fmtSize(a.fileSizeBytes) }} · {{ a.uploadedAt | date:'MMM d, y' }}</span>
+                  </div>
+                  <button class="dl-btn" (click)="download(a)" title="Download">
+                    <i class="bi bi-download"></i>
+                  </button>
+                  @if (!isClosed) {
+                    <button class="del-btn" (click)="deleteAttachment(a)"
+                      [disabled]="deletingAttachId() === a.id" title="Delete">
+                      @if (deletingAttachId() === a.id) { <span class="spin-sm"></span> }
+                      @else { <i class="bi bi-trash"></i> }
+                    </button>
+                  }
+                </div>
+              } @empty {
+                <p class="empty-msg">No attachments yet.</p>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Status History -->
+        <div class="card">
+          <div class="ch"><h3><i class="bi bi-clock-history"></i> Status History</h3></div>
+          <div class="cb">
+            @if (history().length > 0) {
+              <div class="timeline">
+                @for (h of history(); track h.id) {
+                  <div class="tl-item">
+                    <div class="tl-dot"></div>
+                    <div class="tl-content">
+                      <div class="tl-change">
+                        <span class="tl-old">{{ h.oldStatusName ?? 'New' }}</span>
+                        <i class="bi bi-arrow-right tl-arrow"></i>
+                        <span class="tl-new">{{ h.newStatusName }}</span>
+                      </div>
+                      <div class="tl-meta">
+                        <span>{{ h.changedByUserName }}</span>
+                        <span>·</span>
+                        <span>{{ h.changedAt | date:'MMM d, y h:mm a' }}</span>
+                      </div>
+                      @if (h.note) {
+                        <p class="tl-note">{{ h.note }}</p>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            } @else {
+              <p class="empty-msg">No status changes yet.</p>
+            }
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── Sidebar ── -->
+      <div class="scol">
+        <div class="card">
+          <div class="ch"><h3><i class="bi bi-info-circle"></i> Ticket Details</h3></div>
+          <div class="cb">
+            <dl class="ddl">
+              <dt>Status</dt>
+              <dd><span class="badge-status status-{{ ticket()!.statusName | lowercase | replace:' ':'-' }}">{{ ticket()!.statusName }}</span></dd>
+              <dt>Priority</dt>
+              <dd><span class="badge-priority" [style.background]="prioBg(ticket()!.priorityName)">{{ ticket()!.priorityName }}</span></dd>
+              <dt>Department</dt>  <dd>{{ ticket()!.departmentName ?? '—' }}</dd>
+              <dt>Category</dt>    <dd>{{ ticket()!.categoryName ?? '—' }}</dd>
+              <dt>Assigned To</dt>
+              <dd class="dd-asn">
+                @if (ticket()!.currentAssigneeUserName) {
+                  <i class="bi bi-person-check-fill" style="color:#16a34a"></i>
+                  {{ ticket()!.currentAssigneeUserName }}
+                } @else {
+                  <i class="bi bi-hourglass" style="color:var(--text-faint)"></i>
+                  Awaiting assignment
+                }
+              </dd>
+              <dt>Submitted</dt>   <dd>{{ ticket()!.createdAt | date:'MMM d, y' }}</dd>
+              <dt>Updated</dt>     <dd>{{ ticket()!.updatedAt ? (ticket()!.updatedAt | date:'MMM d, y') : '—' }}</dd>
+              <dt>Due Date</dt>
+              <dd [class.ov]="ticket()!.dueAt && isOverdue(ticket()!.dueAt!)">
+                {{ ticket()!.dueAt ? (ticket()!.dueAt | date:'MMM d, y') : '—' }}
+              </dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  } @else {
+    <div class="loading-state"><div class="loading-ring"></div></div>
+  }
+</div>

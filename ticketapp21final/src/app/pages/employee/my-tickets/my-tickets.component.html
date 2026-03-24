@@ -1,0 +1,101 @@
+<app-navbar />
+<div class="page">
+  <div class="ph">
+    <div>
+      <h1 class="pt">My Tickets</h1>
+      <p class="ps">Your submitted requests — {{ total }} total</p>
+    </div>
+    <a routerLink="/employee/create-ticket" class="btn-new">
+      <i class="bi bi-plus"></i> New Ticket
+    </a>
+  </div>
+
+  <!-- Status filter chips -->
+  <div class="chips">
+    <button class="chip" [class.active]="selected() === undefined" (click)="setStatus(undefined)">
+      All <span class="chip-count">{{ total }}</span>
+    </button>
+    @for (s of statuses(); track s.id) {
+      <button class="chip" [class.active]="selected() === s.name" (click)="setStatus(s.name)">
+        {{ s.name }}
+        <span class="chip-count">{{ countByStatus(s.name) }}</span>
+      </button>
+    }
+  </div>
+
+  <!-- Loading -->
+  @if (loadingState()) {
+    <div class="loading-state"><div class="loading-ring"></div></div>
+  }
+
+  @if (!loadingState()) {
+    <div class="tlist">
+      @for (t of paginated(); track t.id) {
+        <a [routerLink]="['/employee/tickets', t.id]" class="tc">
+          <div class="tcm">
+            <div class="tctop">
+              <span class="tid">#{{ t.id }}</span>
+              <span class="badge-status status-{{ t.statusName | lowercase | replace:' ':'-' }}">
+                {{ t.statusName }}
+              </span>
+              <span class="badge-priority" [style.background]="prioBg(t.priorityName)">
+                {{ t.priorityName }}
+              </span>
+              @if (t.dueAt && isOverdue(t.dueAt)) {
+                <span class="ov-badge"><i class="bi bi-alarm"></i> Overdue</span>
+              }
+            </div>
+            <h3 class="tttl">{{ t.title }}</h3>
+            <div class="tcmeta">
+              @if (t.departmentName) {
+                <span><i class="bi bi-building"></i> {{ t.departmentName }}</span>
+              }
+              @if (t.currentAssigneeUserName) {
+                <span><i class="bi bi-person-check"></i> {{ t.currentAssigneeUserName }}</span>
+              } @else {
+                <span class="unassigned"><i class="bi bi-hourglass"></i> Awaiting assignment</span>
+              }
+              <span><i class="bi bi-clock"></i> {{ t.createdAt | date:'MMM d, y' }}</span>
+              @if (t.dueAt) {
+                <span><i class="bi bi-calendar-event"></i> Due {{ t.dueAt | date:'MMM d' }}</span>
+              }
+            </div>
+          </div>
+          <i class="bi bi-chevron-right chev"></i>
+        </a>
+      } @empty {
+        <div class="empty">
+          @if (total === 0) {
+            <i class="bi bi-inbox"></i>
+            <p>You haven't submitted any tickets yet</p>
+            <a routerLink="/employee/create-ticket" class="btn-new" style="display:inline-flex">
+              Submit your first ticket
+            </a>
+          } @else {
+            <i class="bi bi-funnel"></i>
+            <p>No tickets match the selected filter</p>
+            <button class="btn-clear" (click)="setStatus(undefined)">Clear filter</button>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Pagination -->
+    @if (filtered().length > pageSize) {
+      <div class="pgbar">
+        <span class="pgi">
+          Showing {{ ((page()-1)*pageSize)+1 }}–{{ min(page()*pageSize, filtered().length) }}
+          of {{ filtered().length }}
+        </span>
+        <div class="pgbtns">
+          <button class="pgb" [disabled]="page()===1" (click)="prevPage()"><i class="bi bi-chevron-left"></i></button>
+          @for (p of pageNumbers(); track p) {
+            @if (p === -1) { <span class="pg-ellipsis">…</span> }
+            @else { <button class="pgb pgb-num" [class.pgb-active]="page()===p" (click)="goToPage(p)">{{ p }}</button> }
+          }
+          <button class="pgb" [disabled]="isLastPage()" (click)="nextPage()"><i class="bi bi-chevron-right"></i></button>
+        </div>
+      </div>
+    }
+  }
+</div>

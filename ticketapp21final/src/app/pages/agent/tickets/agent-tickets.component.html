@@ -1,0 +1,58 @@
+<app-navbar />
+<div class="page">
+  <div class="ph">
+    <div>
+      <h1 class="pt">My Tickets</h1>
+      <p class="ps">Assigned to you — {{ result()?.totalCount ?? 0 }} total</p>
+    </div>
+    <select [(ngModel)]="statusId" (change)="applyFilter()" class="fsel">
+      <option [ngValue]="undefined">All Statuses</option>
+      @for (s of statuses(); track s.id) { <option [ngValue]="s.id">{{ s.name }}</option> }
+    </select>
+  </div>
+
+  <div class="tlist">
+    @for (t of result()?.items ?? []; track t.id) {
+      <div class="tc">
+        <div class="tcm">
+          <div class="tctop">
+            <span class="tid">#{{ t.id }}</span>
+            <span class="badge-status status-{{ t.status | lowercase | replace:' ':'-' }}">{{ t.status }}</span>
+            <span class="badge-priority" [style.background]="prioBg(t.priority)">{{ t.priority }}</span>
+            @if (t.dueAt && isOverdue(t.dueAt)) {
+              <span class="ov-badge"><i class="bi bi-alarm"></i> Overdue</span>
+            }
+          </div>
+          <h3 class="tttl">{{ t.title }}</h3>
+          <div class="tcmeta">
+            @if (t.department) { <span><i class="bi bi-building"></i> {{ t.department }}</span> }
+            <span><i class="bi bi-person"></i> {{ t.createdBy }}</span>
+            <span><i class="bi bi-calendar3"></i> {{ t.createdAt | date:'MMM d, y' }}</span>
+            @if (t.dueAt) { <span><i class="bi bi-calendar-event"></i> Due {{ t.dueAt | date:'MMM d' }}</span> }
+          </div>
+        </div>
+        <a [routerLink]="['/agent/tickets', t.id]" class="vbtn">View <i class="bi bi-arrow-right"></i></a>
+      </div>
+    } @empty {
+      <div class="empty"><i class="bi bi-inbox"></i><p>No tickets assigned to you</p></div>
+    }
+  </div>
+
+  <!-- Pagination -->
+  @if (result() && result()!.totalCount > pageSize) {
+    <div class="pgbar">
+      <span class="pgi">
+        Showing {{ ((page()-1)*pageSize)+1 }}–{{ min(page()*pageSize, result()!.totalCount) }}
+        of {{ result()!.totalCount }}
+      </span>
+      <div class="pgbtns">
+        <button class="pgb" [disabled]="page()===1" (click)="prevPage()"><i class="bi bi-chevron-left"></i></button>
+        @for (p of pageNumbers(); track p) {
+          @if (p === -1) { <span class="pg-ellipsis">…</span> }
+          @else { <button class="pgb pgb-num" [class.pgb-active]="page()===p" (click)="goToPage(p)">{{ p }}</button> }
+        }
+        <button class="pgb" [disabled]="isLastPage()" (click)="nextPage()"><i class="bi bi-chevron-right"></i></button>
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,43 @@
+<div class="auth-page">
+  <div class="auth-left">
+    <div class="brand"><i class="bi bi-ticket-perforated-fill"></i><h1>TicketDesk</h1></div>
+    <p class="tagline">We’re here to help resolve your complaints faster.</p>
+    <div class="features">
+      <div class="feat"><div class="feat-icon"><i class="bi bi-lightning-fill"></i></div><span>Easy ticket submission</span></div>
+      <div class="feat"><div class="feat-icon"><i class="bi bi-shield-check"></i></div><span>Instant status updates</span></div>
+      <div class="feat"><div class="feat-icon"><i class="bi bi-graph-up"></i></div><span>Faster resolution for every complaint</span></div>
+    </div>
+  </div>
+
+  <div class="auth-right">
+    <div class="auth-card">
+      <div class="auth-head"><h2>Welcome back</h2><p>Sign in to your account to continue</p></div>
+      <form (ngSubmit)="onSubmit()" #f="ngForm" novalidate class="auth-form">
+        <div class="fg">
+          <label>Username</label>
+          <div class="iw">
+            <i class="bi bi-person ii"></i>
+            <input type="text" name="userName" [(ngModel)]="form.userName" required
+              placeholder="Enter your username" class="fc" autocomplete="username" />
+          </div>
+        </div>
+        <div class="fg">
+          <label>Password</label>
+          <div class="iw">
+            <i class="bi bi-lock ii"></i>
+            <input [type]="showPwd() ? 'text' : 'password'" name="password" [(ngModel)]="form.password"
+              required placeholder="Enter your password" class="fc" autocomplete="current-password" />
+            <button type="button" class="eye-btn" (click)="togglePwd()">
+              <i class="bi" [class.bi-eye]="!showPwd()" [class.bi-eye-slash]="showPwd()"></i>
+            </button>
+          </div>
+        </div>
+        <button type="submit" class="submit-btn" [disabled]="loading() || !f.valid">
+          @if (loading()) { <span class="spin"></span> Signing in… }
+          @else { <i class="bi bi-box-arrow-in-right"></i> Sign In }
+        </button>
+        <p class="switch">Don't have an account? <a routerLink="/register">Create one</a></p>
+      </form>
+    </div>
+  </div>
+</div>

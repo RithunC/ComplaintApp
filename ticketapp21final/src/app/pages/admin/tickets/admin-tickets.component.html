@@ -1,0 +1,102 @@
+<app-navbar />
+<div class="page">
+  <div class="ph">
+    <div>
+      <h1 class="pt">All Tickets</h1>
+      <p class="ps">{{ result()?.totalCount ?? 0 }} total tickets</p>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-card">
+    <div class="fg4">
+      <div class="fg">
+        <label>Status</label>
+        <select [(ngModel)]="filters.statusId" (change)="applyFilter()" class="fsel">
+          <option [ngValue]="undefined">All Statuses</option>
+          @for (s of statuses(); track s.id) { <option [ngValue]="s.id">{{ s.name }}</option> }
+        </select>
+      </div>
+      <div class="fg">
+        <label>Priority</label>
+        <select [(ngModel)]="filters.priorityId" (change)="applyFilter()" class="fsel">
+          <option [ngValue]="undefined">All Priorities</option>
+          @for (p of priorities(); track p.id) { <option [ngValue]="p.id">{{ p.name }}</option> }
+        </select>
+      </div>
+      <div class="fg">
+        <label>Department</label>
+        <select [(ngModel)]="filters.departmentId" (change)="applyFilter()" class="fsel">
+          <option [ngValue]="undefined">All Departments</option>
+          @for (d of departments(); track d.id) { <option [ngValue]="d.id">{{ d.name }}</option> }
+        </select>
+      </div>
+      <div class="fg">
+        <label>Sort By</label>
+        <select [(ngModel)]="filters.sortBy" (change)="applyFilter()" class="fsel">
+          <option value="createdAt">Created Date</option>
+          <option value="priority">Priority</option>
+          <option value="dueAt">Due Date</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="tcard">
+    @if (result()?.items?.length) {
+      <div class="twrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>#</th><th>Title</th><th>Status</th><th>Priority</th>
+              <th>Department</th><th>Created By</th><th>Assignee</th>
+              <th>Created</th><th>Due</th><th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (t of result()!.items; track t.id) {
+              <tr>
+                <td><span class="tid">#{{ t.id }}</span></td>
+                <td><span class="ttl" [title]="t.title">{{ t.title }}</span></td>
+                <td><span class="badge-status status-{{ t.status | lowercase | replace:' ':'-' }}">{{ t.status }}</span></td>
+                <td><span class="badge-priority" [style.background]="prioBg(t.priority)">{{ t.priority }}</span></td>
+                <td>{{ t.department ?? '—' }}</td>
+                <td>{{ t.createdBy }}</td>
+                <td>{{ t.assignee ?? '—' }}</td>
+                <td>{{ t.createdAt | date:'MMM d, y' }}</td>
+                <td>@if (t.dueAt) { <span [class.ov]="isOverdue(t.dueAt)">{{ t.dueAt | date:'MMM d' }}</span> } @else { — }</td>
+                <td><a [routerLink]="['/admin/tickets', t.id]" class="vbtn"><i class="bi bi-eye"></i></a></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pgbar">
+        <span class="pgi">
+          Showing {{ ((page()-1)*pageSize)+1 }}–{{ min(page()*pageSize, result()!.totalCount) }}
+          of {{ result()!.totalCount }}
+        </span>
+        <div class="pgbtns">
+          <button class="pgb" [disabled]="page()===1" (click)="prevPage()">
+            <i class="bi bi-chevron-left"></i>
+          </button>
+          @for (p of pageNumbers(); track p) {
+            @if (p === -1) {
+              <span class="pg-ellipsis">…</span>
+            } @else {
+              <button class="pgb pgb-num" [class.pgb-active]="page()===p" (click)="goToPage(p)">{{ p }}</button>
+            }
+          }
+          <button class="pgb" [disabled]="isLastPage()" (click)="nextPage()">
+            <i class="bi bi-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    } @else {
+      <div class="empty"><i class="bi bi-inbox"></i><p>No tickets found</p></div>
+    }
+  </div>
+</div>

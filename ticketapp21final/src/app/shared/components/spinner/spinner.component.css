@@ -1,0 +1,19 @@
+.overlay {
+  position: fixed; inset: 0;
+  background: rgba(33,61,87,.35);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9000; backdrop-filter: blur(4px);
+}
+.box { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.ring {
+  width: 48px; height: 48px; border-radius: 50%;
+  border: 3px solid var(--border);
+  border-top-color: var(--primary);
+  animation: spin .8s linear infinite;
+}
+.box span {
+  color: var(--primary); font-size: 13px; font-weight: 600;
+  letter-spacing: .04em; background: #fff; padding: 4px 14px;
+  border-radius: 99px; box-shadow: var(--shadow-sm);
+}
+@keyframes spin { to { transform: rotate(360deg); } }

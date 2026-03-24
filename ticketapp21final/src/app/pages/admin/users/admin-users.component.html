@@ -1,0 +1,71 @@
+<app-navbar />
+<div class="page">
+  <div class="ph">
+    <div>
+      <h1 class="pt">Users</h1>
+      <p class="ps">{{ filtered().length }} user(s) found</p>
+    </div>
+    <div class="search-wrap">
+      <i class="bi bi-search si"></i>
+      <input type="text" [ngModel]="search()" (ngModelChange)="search.set($event); onSearch()"
+        placeholder="Search by name, username, role…" class="sinp" />
+    </div>
+  </div>
+
+  <div class="tcard">
+    @if (paginated().length) {
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>#</th><th>User</th><th>Username</th><th>Role</th>
+            <th>Department</th><th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (u of paginated(); track u.id) {
+            <tr>
+              <td><span class="uid">#{{ u.id }}</span></td>
+              <td>
+                <div class="acell">
+                  <div class="av">{{ u.displayName[0].toUpperCase() }}</div>
+                  <span class="an">{{ u.displayName }}</span>
+                </div>
+              </td>
+              <td><span class="un">{{ u.userName }}</span></td>
+              <td>
+                <span class="rbadge role-{{ u.roleName | lowercase }}">{{ u.roleName }}</span>
+              </td>
+              <td>{{ u.departmentName ?? '—' }}</td>
+              <td>
+                <span class="scell" [class.act]="u.isActive">
+                  <i class="bi" [class.bi-check-circle-fill]="u.isActive" [class.bi-x-circle-fill]="!u.isActive"></i>
+                  {{ u.isActive ? 'Active' : 'Inactive' }}
+                </span>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      <!-- Pagination -->
+      @if (filtered().length > pageSize) {
+        <div class="pgbar">
+          <span class="pgi">
+            Showing {{ ((page()-1)*pageSize)+1 }}–{{ min(page()*pageSize, filtered().length) }}
+            of {{ filtered().length }}
+          </span>
+          <div class="pgbtns">
+            <button class="pgb" [disabled]="page()===1" (click)="prevPage()"><i class="bi bi-chevron-left"></i></button>
+            @for (p of pageNumbers(); track p) {
+              @if (p === -1) { <span class="pg-ellipsis">…</span> }
+              @else { <button class="pgb pgb-num" [class.pgb-active]="page()===p" (click)="goToPage(p)">{{ p }}</button> }
+            }
+            <button class="pgb" [disabled]="isLastPage()" (click)="nextPage()"><i class="bi bi-chevron-right"></i></button>
+          </div>
+        </div>
+      }
+    } @else {
+      <div class="empty"><i class="bi bi-people"></i><p>No users found</p></div>
+    }
+  </div>
+</div>

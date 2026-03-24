@@ -1,0 +1,15 @@
+<app-navbar />
+<div class="page">
+  <div class="ph"><div><h1 class="pt">Welcome, {{auth.currentUser()?.displayName}}</h1><p class="ps">Your support queue</p></div><a routerLink="/agent/tickets" class="btn-pri"><i class="bi bi-inbox"></i> My Queue</a></div>
+  @if (summary()) {
+    <div class="sgrid">
+      <div class="sc sc-b"><div class="si"><i class="bi bi-person-check"></i></div><div class="sb"><span class="sv">{{summary()!.assignedToMe}}</span><span class="sl">Assigned to Me</span></div></div>
+      <div class="sc sc-i"><div class="si"><i class="bi bi-circle"></i></div><div class="sb"><span class="sv">{{summary()!.open}}</span><span class="sl">Open</span></div></div>
+      <div class="sc sc-p"><div class="si"><i class="bi bi-arrow-clockwise"></i></div><div class="sb"><span class="sv">{{summary()!.inProgress}}</span><span class="sl">In Progress</span></div></div>
+      <div class="sc sc-g"><div class="si"><i class="bi bi-check-circle"></i></div><div class="sb"><span class="sv">{{summary()!.resolved}}</span><span class="sl">Resolved</span></div></div>
+      <div class="sc sc-r"><div class="si"><i class="bi bi-exclamation-triangle"></i></div><div class="sb"><span class="sv">{{summary()!.overdue}}</span><span class="sl">Overdue</span></div></div>
+    </div>
+    <h2 class="sth">Quick Actions</h2>
+    <a routerLink="/agent/tickets" class="qa"><div class="qa-icon"><i class="bi bi-inbox"></i></div><div class="qa-text"><h3>My Queue</h3><p>View and manage your assigned tickets</p></div><i class="bi bi-arrow-right qa-arr"></i></a>
+  } @else { <div class="loading-state"><div class="loading-ring"></div></div> }
+</div>

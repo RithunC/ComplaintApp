@@ -1,0 +1,115 @@
+<app-navbar />
+<div class="page">
+  <div class="page-header">
+    <h1 class="pt">My Profile</h1>
+    <p class="ps">View and update your account details</p>
+  </div>
+
+  @if (profile()) {
+    <div class="profile-grid">
+
+      <!-- Left: Avatar card -->
+      <div class="avatar-card">
+        <div class="big-avatar">{{ initials() }}</div>
+        <h2 class="av-name">{{ profile()!.displayName }}</h2>
+        <p class="av-username">&#64;{{ profile()!.userName }}</p>
+        <div class="av-badges">
+          <span class="role-badge role-{{ profile()!.roleName | lowercase }}">
+            <i class="bi bi-shield-check"></i> {{ profile()!.roleName }}
+          </span>
+          <span class="status-badge" [class.active]="profile()!.isActive">
+            <i class="bi bi-circle-fill"></i>
+            {{ profile()!.isActive ? 'Active' : 'Inactive' }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Right: Details / Edit form -->
+      <div class="details-card">
+        <div class="dc-header">
+          <h3>Account Information</h3>
+          @if (!editing()) {
+            <button class="btn-edit" (click)="startEdit()">
+              <i class="bi bi-pencil"></i> Edit Profile
+            </button>
+          }
+        </div>
+
+        @if (!editing()) {
+          <!-- View mode -->
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label"><i class="bi bi-person"></i> Display Name</span>
+              <span class="info-val">{{ profile()!.displayName }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label"><i class="bi bi-at"></i> Username</span>
+              <span class="info-val">{{ profile()!.userName }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label"><i class="bi bi-envelope"></i> Email</span>
+              <span class="info-val">{{ profile()!.email ?? '—' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label"><i class="bi bi-telephone"></i> Phone</span>
+              <span class="info-val">{{ profile()!.phone ?? '—' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label"><i class="bi bi-shield"></i> Role</span>
+              <span class="info-val">{{ profile()!.roleName }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label"><i class="bi bi-circle-fill status-dot"></i> Status</span>
+              <span class="info-val" [class.active-text]="profile()!.isActive">
+                {{ profile()!.isActive ? 'Active' : 'Inactive' }}
+              </span>
+            </div>
+          </div>
+
+          <div class="edit-note">
+            <i class="bi bi-info-circle"></i>
+            Click <strong>Edit Profile</strong> to update your display name and phone number.
+          </div>
+
+        } @else {
+          <!-- Edit mode -->
+          <div class="edit-form">
+            <div class="fg">
+              <label>Display Name <span class="req">*</span></label>
+              <div class="iw">
+                <i class="bi bi-person ii"></i>
+                <input type="text" [(ngModel)]="editForm.displayName"
+                  placeholder="Your full name" class="fc" maxlength="150" />
+              </div>
+            </div>
+
+            <div class="fg">
+              <label>Phone Number</label>
+              <div class="iw">
+                <i class="bi bi-telephone ii"></i>
+                <input type="tel" [(ngModel)]="editForm.phone"
+                  placeholder="e.g. +91 9876543210" class="fc" maxlength="30" />
+              </div>
+              <small class="field-hint">Optional.</small>
+            </div>
+
+            <div class="readonly-note">
+              <i class="bi bi-lock"></i>
+              Username, email, role cannot be changed here. Contact your administrator.
+            </div>
+
+            <div class="edit-actions">
+              <button class="btn-cancel" (click)="cancelEdit()">Cancel</button>
+              <button class="btn-save" (click)="saveEdit()" [disabled]="saving()">
+                @if (saving()) { <span class="spin"></span> Saving… }
+                @else { <i class="bi bi-check-circle"></i> Save Changes }
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  } @else {
+    <div class="loading-state"><div class="loading-ring"></div></div>
+  }
+</div>

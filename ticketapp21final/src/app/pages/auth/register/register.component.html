@@ -1,0 +1,118 @@
+<div class="auth-page">
+  <div class="auth-left">
+    <div class="brand">
+      <i class="bi bi-ticket-perforated-fill"></i>
+      <h1>TicketDesk</h1>
+    </div>
+    <p class="tagline">Join your team and start managing support tickets efficiently.</p>
+    <div class="features">
+      <div class="feat"><div class="feat-icon"><i class="bi bi-person-badge-fill"></i></div><span>Role-based access</span></div>
+      <div class="feat"><div class="feat-icon"><i class="bi bi-building"></i></div><span>Department routing</span></div>
+      <div class="feat"><div class="feat-icon"><i class="bi bi-chat-dots"></i></div><span>Real-time collaboration</span></div>
+    </div>
+  </div>
+
+  <div class="auth-right">
+    <div class="auth-card">
+      <div class="auth-head">
+        <h2>Create account</h2>
+        <p>Fill in your details to get started</p>
+      </div>
+
+      <form (ngSubmit)="onSubmit()" #f="ngForm" novalidate class="auth-form">
+
+        <!-- Row 1: Username + Display Name -->
+        <div class="row2">
+          <div class="fg">
+            <label for="userName">Username <span class="req">*</span></label>
+            <div class="iw">
+              <i class="bi bi-person ii"></i>
+              <input id="userName" type="text" name="userName" [(ngModel)]="form.userName"
+                required placeholder="username" class="fc" autocomplete="username" />
+            </div>
+          </div>
+          <div class="fg">
+            <label for="displayName">Display Name <span class="req">*</span></label>
+            <div class="iw">
+              <i class="bi bi-type ii"></i>
+              <input id="displayName" type="text" name="displayName" [(ngModel)]="form.displayName"
+                required placeholder="Full Name" class="fc" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="fg">
+          <label for="email">Email <span class="req">*</span></label>
+          <div class="iw">
+            <i class="bi bi-envelope ii"></i>
+            <input id="email" type="email" name="email" [(ngModel)]="form.email"
+              required placeholder="you@company.com" class="fc" autocomplete="email" />
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div class="fg">
+          <label for="password">Password <span class="req">*</span></label>
+          <div class="iw">
+            <i class="bi bi-lock ii"></i>
+            <input id="password" [type]="showPwd() ? 'text' : 'password'"
+              name="password" [(ngModel)]="form.password"
+              required minlength="6" placeholder="Min 6 characters" class="fc" />
+            <button type="button" class="eye-btn" (click)="togglePwd()">
+              <i class="bi" [class.bi-eye]="!showPwd()" [class.bi-eye-slash]="showPwd()"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Row 2: Role + Department -->
+        <div class="row2">
+          <!-- ROLE -->
+          <div class="fg">
+            <label for="roleName">Role <span class="req">*</span></label>
+            <div class="iw">
+              <i class="bi bi-shield ii"></i>
+              <select id="roleName" name="roleName" [(ngModel)]="form.roleName"
+                required class="fc sel">
+                <option value="" disabled>Select role…</option>
+                @for (r of roles(); track r.id) {
+                  <option [value]="r.name">{{ r.name }}</option>
+                }
+              </select>
+            </div>
+            @if (roles().length === 0) {
+              <span class="hint-warn"><i class="bi bi-exclamation-circle"></i> Loading roles…</span>
+            }
+          </div>
+
+          <!-- DEPARTMENT -->
+          <div class="fg">
+            <label for="departmentName">Department</label>
+            <div class="iw">
+              <i class="bi bi-building ii"></i>
+              <select id="departmentName" name="departmentName" [(ngModel)]="form.departmentName"
+                class="fc sel">
+                <option value="">No Department</option>
+                @for (d of departments(); track d.id) {
+                  <option [value]="d.name">{{ d.name }}</option>
+                }
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" class="submit-btn"
+          [disabled]="loading() || !f.valid || !form.roleName">
+          @if (loading()) {
+            <span class="spin"></span> Creating account…
+          } @else {
+            <i class="bi bi-person-plus"></i> Create Account
+          }
+        </button>
+
+        <p class="switch">Have an account? <a routerLink="/login">Sign in</a></p>
+      </form>
+    </div>
+  </div>
+</div>
